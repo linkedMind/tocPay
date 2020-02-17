@@ -90,13 +90,13 @@
 </body>
 <script>
     $(function(){
-        let phone = localStorage.getItem("phone");
-        let tradeId=localStorage.getItem("tradeId");
-        if (null==phone||undefined==phone||null==tradeId||undefined==tradeId){
-            window.location.href="pay.html"
-        }
-        // var phone="123456";
-        // var tradeId="xx123"
+        // let phone = localStorage.getItem("phone");
+        // let tradeId=localStorage.getItem("tradeId");
+        // if (null==phone||undefined==phone||null==tradeId||undefined==tradeId){
+        //     window.location.href="toc_pay.html"
+        // }
+        var phone="123456";
+        var tradeId="xx123"
         $.ajax({
             url:"http://192.168.5.8:9000/LinkMind/kinder2cpay/findStuIDByPhoneAndTransactionId?phone="+phone+"&traId="+tradeId,
             // url:"https://51study.51cth.com/LinkMind/kinder2cpay/findStuIDByPhoneAndOutTradeNo?phone="+phone+"&traId="+tradeId,

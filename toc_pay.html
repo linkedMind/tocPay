@@ -155,8 +155,8 @@
     var num=60;
     var tradeId;
     //todo 用于MD5加密，环境不同需要修改
-    const HOST="https://51study.51cth.com"
-    // const HOST="http://192.168.5.8"
+    // const HOST="https://51study.51cth.com"
+    const HOST="http://192.168.5.8"
     $(function(){
         localStorage.clear();
         document.getElementById("verifyCode").style.display="inline";
@@ -182,7 +182,8 @@
             "dataType":"getVerifyCodeSafe"
         };
         //todo 环境不同需要修改
-        var url='https://51study.51cth.com/LinkMind/appServlet?params='+JSON.stringify(params)
+        // var url='https://51study.51cth.com/LinkMind/appServlet?params='+JSON.stringify(params)
+        var url='http://192.168.5.8:9000/LinkMind/appServlet?params='+JSON.stringify(params)
         $.ajax({
             url:url,
             dataType : "text",
