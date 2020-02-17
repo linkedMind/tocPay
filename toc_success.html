@@ -79,22 +79,37 @@
     <!--<toc_img class="pay-bg" src="../toc_img/paysuccess_bg.jpg">-->
     <div class="detail">
         <div class="stuNo">您的学号是</div>
-        <div class="stuNo-val">0000000</div>
+        <div id="stuNo" class="stuNo-val"></div>
         <div class="warn">请妥善保管</div>
         <div class="extra">
             <div>付款金额: 49元</div>
-            <div style="margin-top: 10px">下单时间: 2020-02-10 12:22:22</div>
+            <div style="margin-top: 10px;display: flex;flex-direction: row;align-items: center;">下单时间: <p id="tradTime"></p></div>
         </div>
     </div>
 </div>
 </body>
 <script>
     $(function(){
-        // let item = localStorage.getItem("phone");
-        // if (null==item||undefined==item){
-        //     window.location.href="pay.html"
-        // }
-
+        let phone = localStorage.getItem("phone");
+        let tradeId=localStorage.getItem("tradeId");
+        if (null==phone||undefined==phone||null==tradeId||undefined==tradeId){
+            window.location.href="pay.html"
+        }
+        // var phone="123456";
+        // var tradeId="xx123"
+        $.ajax({
+            url:"http://192.168.5.8:9000/LinkMind/kinder2cpay/findStuIDByPhoneAndTransactionId?phone="+phone+"&traId="+tradeId,
+            // url:"https://51study.51cth.com/LinkMind/kinder2cpay/findStuIDByPhoneAndOutTradeNo?phone="+phone+"&traId="+tradeId,
+            dataType : "json",
+            type:'GET',
+            success:function (data,status) {
+                document.getElementById("stuNo").innerHTML=data.data.stuID;
+                document.getElementById("tradTime").innerHTML=data.data.createTime;
+            },
+            //失败/超时
+            error:function(XMLHttpRequest,textStatus,errorThrown){
+            }
+        })
 
     });
 

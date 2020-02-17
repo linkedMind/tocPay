@@ -153,8 +153,10 @@
 <script src="toc_js/md5.js" language="javascript" charset="utf-8"></script>
 <script type="text/javascript" >
     var num=60;
+    var tradeId;
     //todo 用于MD5加密，环境不同需要修改
     const HOST="https://51study.51cth.com"
+    // const HOST="http://192.168.5.8"
     $(function(){
         localStorage.clear();
         document.getElementById("verifyCode").style.display="inline";
@@ -302,6 +304,7 @@
         $.ajax({
             type: "post",
             url: "https://51study.51cth.com/LinkMind/pay/jsapipay",// 保存招商信息
+            // url: "http://192.168.5.8:8080/LinkMind/pay/jsapipay",// 保存招商信息
             data: {
                 "name":name,
                 "kindergarten":kinderGarten,
@@ -313,6 +316,7 @@
                 if (data.flag == 0) {
                     var data = data.data;
                     alert(JSON.stringify(data));
+                    localStorage.setItem("tradeId",data.transaction_id);
                     onBridgeReady(data.appId,data.timeStamp,data.nonceStr,data.package,data.signType,data.paySign)
                 } else {
                     console.log("提交失败");
