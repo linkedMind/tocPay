@@ -1,0 +1,370 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+    <meta charset="utf-8">
+    <title>聪明班尼在线支付</title>
+    <meta name="description" content="">
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />-->
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta name="viewport" content="inital-scale=1.0,maximum-scale=1.0,user-scalable=no;">
+    <script src="toc_js/jquery-3.1.1.min.js"></script>
+    <style>
+        input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {
+            color: #bababa;
+            border:0px;
+            outline:none;
+        }
+        html{
+            height: 100%;
+            width: 100%;
+        }
+        body{
+            height: 100%;
+            width: 100%;
+            margin: 0px 0px 0px 0px;
+        }
+        .content {
+            height: 100%;
+            width:100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url("toc_img/pay_bg.jpg") no-repeat;
+            background-size:100% 100%;
+        }
+        .detail {
+            z-index: 99;
+            height: auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .money {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .mui-input-group {
+            background: white;
+            width: 800px;
+            height: 403px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mui-input-row {
+            height: 100px;
+            width: 760px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            border-bottom: 1px solid #bababa;
+            line-height: 80px;
+        }
+
+        .mui-input-clear {
+            width: 580px;
+            border: none;
+            line-height: 80px;
+            font-size: 26px;
+        }
+
+        .row-code {
+            width: 180px;
+            height: 80px;
+            background-color: whitesmoke;
+            border-radius: 20px;
+        }
+
+        .sb-button {
+            width: 800px;
+            height: 100px;
+            margin-top: 40px;
+            background: rgb(254,212,45);
+            text-align: center;
+            line-height: 100px;
+            font-size: 42px;
+            font-weight: bold;
+            border-radius: 10px;
+            /*background: url("../toc_img/commit.png") no-repeat;*/
+            /*background-size:100% 100%;*/
+        }
+        .numDiv{
+            font-size: 26px;
+            text-align: center;
+            margin-left: 65px;
+            border-radius: 20px;
+        }
+
+    </style>
+</head>
+
+<body>
+<div class="content">
+    <!--<toc_img class="pay-bg" src="../toc_img/pay_bg.jpg">-->
+    <div class="detail">
+        <div class="money">
+            <div style="font-size: 24px;">支付金额</div>
+            <div style="font-size: 52px;">￥49.00</div>
+        </div>
+        <form class="mui-input-group" id="form" name="Form" method="post">
+            <div class="mui-input-row">
+                <input type="text" class="mui-input-clear" placeholder="请输入孩子姓名" id="name" value="">
+                <div class="row-code" hidden>
+                    <img src="toc_img/code.png">
+                </div>
+            </div>
+            <div class="mui-input-row">
+                <input type="text" class="mui-input-clear" placeholder="请输入孩子所在幼儿园" id="kinderGarten" value="">
+                <div class="row-code" hidden>
+                    <img src="toc_img/code.png">
+                </div>
+            </div>
+            <div class="mui-input-row">
+                <input type="text" class="mui-input-clear" oninput="value=value.replace(/[^\d]/g,'')" placeholder="请输入您的手机号" id="phone" value="" maxlength=11 onblur="verifyPhone()">
+                <div class="row-code" hidden>
+                    <img  src="toc_img/code.png">
+                </div>
+            </div>
+            <div class="mui-input-row" style="border-bottom:none">
+                <input type="text" class="mui-input-clear" placeholder="请输入验证码" id="code" value="">
+                <div class="row-code">
+                    <img id="verifyCode"  onclick="getCode()"  src="toc_img/code.png">
+                    <div id='numDiv' class="numDiv">60s</div>
+                </div>
+            </div>
+        </form>
+        <div class="sb-button" onclick="commit()">
+            <!--<toc_img src="../toc_img/commit.png">-->
+            确认支付
+        </div>
+    </div>
+</div>
+</body>
+<script src="toc_js/md5.js" language="javascript" charset="utf-8"></script>
+<script type="text/javascript" >
+    var num=60;
+    //todo 用于MD5加密，环境不同需要修改
+    const HOST="https://51study.51cth.com"
+    $(function(){
+        localStorage.clear();
+        document.getElementById("verifyCode").style.display="inline";
+        document.getElementById("numDiv").style.display="none";
+    });
+    function getCode(){
+        let phone = $("#phone").val();
+        if(!(/^1[3456789]\d{9}$/.test(phone))){
+            alert("手机号码有误，请重填");
+            $("#phone").val("")
+            return false;
+        }
+        document.getElementById("verifyCode").style.display="none";
+        document.getElementById("numDiv").style.display="inline";
+        let myUrl = HOST;
+        let strs = myUrl[0] + myUrl[Math.floor((myUrl.length + 1) / 2)] + myUrl[myUrl.length - 1];
+        let safeCode =$.md5(strs + phone);
+        let params={
+            "phoneNumber":phone,
+            "verifyCodeMode":"cth_pay",
+            "appName":"聪明班尼在线支付",
+            "safeCode":safeCode,
+            "dataType":"getVerifyCodeSafe"
+        };
+        //todo 环境不同需要修改
+        var url='https://51study.51cth.com/LinkMind/appServlet?params='+JSON.stringify(params)
+        $.ajax({
+            url:url,
+            dataType : "text",
+            type:'GET',
+            success:function (data,status) {
+                console.log(data);
+                num=60;
+                document.getElementById("numDiv").innerHTML="60s";
+                numTimer();
+            },
+            //失败/超时
+            error:function(XMLHttpRequest,textStatus,errorThrown){
+                alert("服务错误，验证码发送失败")
+            }
+        })
+    }
+    //倒计时
+    function numTimer() {
+        var int=setInterval(function () {
+            if (num>0) {
+                num--;
+            }else{
+                document.getElementById("verifyCode").style.display="inline";
+                document.getElementById("numDiv").style.display="none";
+                clearInterval(int);
+            }
+        document.getElementById("numDiv").innerHTML=num+"s";
+        },1000);
+    }
+
+    function verifyPhone() {
+        event.stopPropagation();
+        let phone = $("#phone").val();
+        if(!(/^1[3456789]\d{9}$/.test(phone))){
+            alert("手机号码有误，请重填");
+            $("#phone").val("")
+            return false;
+        }
+    }
+    function commit() {
+        let name = $("#name").val()
+        if(null==name||''==name) {
+            alert("请输入孩子姓名");
+            return false
+        }
+        let kinderGarten = $("#kinderGarten").val()
+        if(null==kinderGarten||''==kinderGarten) {
+            alert("请输入孩子所在幼儿园");
+            return false
+        }
+        let phone = $("#phone").val()
+        if(null==phone||''==phone) {
+            alert("请输入您的手机号");
+            return false
+        }else {
+            if(!(/^1[3456789]\d{9}$/.test(phone))){
+                alert("手机号码有误，请重填");
+                return false;
+            }
+        }
+        let code =  $("#code").val()
+        if(null==code||''==code) {
+            alert("请输入验证码");
+            return false
+        }
+        var param={
+            name,kinderGarten,phone,code
+        }
+/*        console.log(param)
+        window.location.href="paystatus.html";*/
+        localStorage.setItem("phone",phone);
+
+        // if (typeof WeixinJSBridge == "undefined"){
+        //     if( document.addEventListener ){
+        //         document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+        //     }else if (document.attachEvent){
+        //         document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+        //         document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+        //     }
+        // }else{
+        //     onBridgeReady();
+        // }
+        gopay(name,kinderGarten,phone,code);
+    }
+
+    window.onload = function () {
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('dblclick', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('touchstart', function (event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        });
+        var lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            var now = (new Date()).getTime();
+            // 如果在300ms内触发两次touchend，就阻止默认事件
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    };
+    function getQueryVariable(variable) {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i=0;i<vars.length;i++) {
+            var pair = vars[i].split("=");
+            if(pair[0] == variable){return pair[1];}
+        }
+        return(false);
+    }
+    function gopay(name,kinderGarten,phone,code) {
+        var wxcode = getQueryVariable("code");
+        $.ajax({
+            type: "post",
+            url: "https://51study.51cth.com/LinkMind/pay/jsapipay",// 保存招商信息
+            data: {
+                "name":name,
+                "kindergarten":kinderGarten,
+                "phone":phone,
+                "code":code,
+                "wxcode":wxcode,
+            },
+            success: function (data) {
+                if (data.flag == 0) {
+                    var data = data.data;
+                    alert(JSON.stringify(data));
+                    onBridgeReady(data.appId,data.timeStamp,data.nonceStr,data.package,data.signType,data.paySign)
+                } else {
+                    console.log("提交失败");
+                }
+            }
+        });
+    }
+
+    function onBridgeReady(appid,timeStamp,nonceStr,pkg,signType,paySign){
+        WeixinJSBridge.invoke(
+            'getBrandWCPayRequest', {
+                "appId":appid,     //公众号名称，由商户传入
+                "timeStamp":timeStamp,         //时间戳，自1970年以来的秒数
+                "nonceStr":nonceStr, //随机串
+                "package":pkg,
+                "signType":signType,         //微信签名方式：
+                "paySign":paySign //微信签名
+            },
+            function(res){
+                if(res.err_msg == "get_brand_wcpay_request:ok" ){
+                    // 使用以上方式判断前端返回,微信团队郑重提示：
+                    //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+                    window.location.href="toc_success.html"
+                }
+            });
+    }
+    if (typeof WeixinJSBridge == "undefined"){
+        if( document.addEventListener ){
+            document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+        }else if (document.attachEvent){
+            document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+            document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+        }
+    }else{
+        onBridgeReady();
+    }
+    // function onBridgeReady(){
+    //     WeixinJSBridge.invoke(
+    //         'getBrandWCPayRequest', {
+    //             "appId":"wx19f360a42e8bc31d",     //公众号名称，由商户传入
+    //             "timeStamp":(new Date()).getTime(),         //时间戳，自1970年以来的秒数
+    //             "nonceStr":"e61463f8efa94090b1f366cccfbbb444", //随机串
+    //             "package":"prepay_id=u802345jgfjsdfgsdg888",
+    //             "signType":"MD5",         //微信签名方式：
+    //             "paySign":"70EA570631E4BB79628FBCA90534C63FF7FADD89" //微信签名
+    //         },
+    //         function(res){
+    //             if(res.err_msg == "get_brand_wcpay_request:ok" ){
+    //                 // 使用以上方式判断前端返回,微信团队郑重提示：
+    //                 //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+    //             }
+    //         });
+    // }
+</script>
+</html>
